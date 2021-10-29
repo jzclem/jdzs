@@ -91,7 +91,7 @@ function killOrderSubmit(Cookie, skuId, num, buyInfo) {
   const params = {
     skuId,
     num,
-    addressId: buyInfo['addressList'][0]['id'],
+    addressId: buyInfo['addressList'][0]['id'], // 4139253293
     yuShou: true,
     isModifyAddress: false,
     name: buyInfo['addressList'][0]['name'],
@@ -213,20 +213,24 @@ async function addGoodsToCart(Cookie, skuId, num) {
 /**
  * 提交订单（当前购物车内所有商品）
  * @param Cookie
+ * @param password
  * @returns {Promise<any>}
  */
-async function orderSubmit(Cookie) {
+async function orderSubmit(Cookie, password) {
   const params = {
     overseaPurchaseCookies: '',
     vendorRemarks: '[]',
+    presaleStockSign: 1,
     'submitOrderParam.sopNotPutInvoice': 'false',
     'submitOrderParam.trackID': 'TestTrackId',
     'submitOrderParam.ignorePriceChange': '0',
     'submitOrderParam.btSupport': '0',
     'submitOrderParam.jxj': '1',
-    'submitOrderParam.payPassword': 'u31u31u31u31u31u31'
-    // 'submitOrderParam.eid': 'KAPAA4UFB4TGCXCJCKQ5KKQCUHMRHJF7CTG2HBWQWSCTM52TDPWS5X47BLQSADQG24AWO4MH76SFJLS56CCBSQE3MM',
-    // 'submitOrderParam.fp': 'cd7cefd18bd71aa3f88da9f6d1d8d0aa',
+    'submitOrderParam.payPassword': `u3${password}`,
+    'submitOrderParam.eid':
+      'KAPAA4UFB4TGCXCJCKQ5KKQCUHMRHJF7CTG2HBWQWSCTM52TDPWS5X47BLQSADQG24AWO4MH76SFJLS56CCBSQE3MM',
+    'submitOrderParam.fp': 'deb1bac170fdbfd7873ecc1e55f4266e',
+    'submitOrderParam.isBestCoupon': '1'
   }
   // 请求结算页面
   await request({

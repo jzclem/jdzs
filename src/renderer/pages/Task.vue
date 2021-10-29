@@ -1,18 +1,22 @@
 <template>
   <div>
-    <a-button type="primary" @click="showAddTask">
-      添加任务
-    </a-button>
-    <a-button type="primary" class="mg-l10" @click="clearAll">
-      删除所有任务
-    </a-button>
-    <a-button type="primary" class="mg-l10" @click="stopAll">
-      停止所有任务
-    </a-button>
-    <a-button type="primary" class="mg-l10" @click="updateMes">
-      更新商品信息
-    </a-button>
-    <a-input class="mg-l10" style="width: 200px" v-model="areaId" />
+    <a-form ref="form" :model="formParams" layout="inline">
+      <a-form-item>
+        <a-button type="primary" @click="showAddTask">添加任务</a-button>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="stopAll">停止所有任务</a-button>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="updateMes">更新商品信息</a-button>
+      </a-form-item>
+      <a-form-item label="区域ID">
+        <a-input style="width: 200px" v-model="formParams.areaId" placeholder="区域id" />
+      </a-form-item>
+      <a-form-item label="支付密码">
+        <a-input type="password" style="width: 200px" v-model="formParams.password" placeholder="支付密码" />
+      </a-form-item>
+    </a-form>
     <a-list item-layout="horizontal" :data-source="taskList">
       <a-list-item slot="renderItem" slot-scope="item">
         <a-list-item-meta :description="`定时：${formatDate(item.startTime)} , 购买数量：${item.buyNum}`">
@@ -56,8 +60,11 @@ export default {
   },
   data() {
     return {
-      areaId: '19_1601_50283_62864',
       timers: [],
+      formParams: {
+        areaId: '19_1601_50283_62864',
+        password: ''
+      },
       actions: new Map([
         [1, 'orderSubmit'],
         [2, 'killOrderSubmit']
@@ -76,7 +83,11 @@ export default {
       this.$refs.addTask.show()
     },
     async createOrders({ skuId, buyNum, taskType, isSetTime, startTime }) {
-      let StockState = await jd.getStocks(skuId, this.areaId)
+      if (!this.formParams.password) {
+        this.$notification.open({ message: '请输入支付密码', description: '', placement: 'bottomRight' })
+        return
+      }
+      let StockState = await jd.getStocks(skuId, this.formParams.areaId)
       if (StockState) {
         this.$notification.open({
           message: '检测到该地区有货，开始抢购',
@@ -107,8 +118,9 @@ export default {
       }
     },
     async createOrder(account, skuId, buyNum, taskType) {
-      const buyInfo = await jd.getBuyInfo(account.cookie, skuId, buyNum)
-      const submitResult = await jd[this.actions.get(taskType)](account.cookie, skuId, buyNum, buyInfo)
+      await jd.getBuyInfo(account.cookie, skuId, buyNum)
+      let password = this.formParams.password.split('').join('u3')
+      const submitResult = await jd[this.actions.get(taskType)](account.cookie, password)
       if (submitResult && submitResult.success) {
         this.stopTaskByAccount(account.pinId, skuId)
         this.$notification.open({

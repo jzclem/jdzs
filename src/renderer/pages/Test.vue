@@ -20,9 +20,8 @@ export default {
   methods: {
     async test() {
       try {
-        // const account = this.accountList[0]
-        // const buyInfo = await jd.getBuyInfo(account.cookie, 100017784106, 1)
-        const data = await jd.getStocks('100017784106', '19_1601_50283_62864')
+        const data = await jd.getBuyInfo(this.accountList[0].cookie, 100017784106, 1)
+        // const data = await jd.getStocks('100017784106', '19_1601_50283_62864')
         log.info(data)
       } catch (error) {
         log.info(error)

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 const jd = window.preload.jd
+import message from 'ant-design-vue/es/message'
 
 const state = {
   /**
@@ -65,8 +66,10 @@ const actions = {
   async addTask({ commit }, { skuId, taskType, isSetTime, startTime, buyNum }) {
     let detail = false
     while (!detail) {
+      message.warning('正在请求接口...')
       detail = await jd.getItemInfo(skuId)
     }
+    message.success('请求接口成功！')
     commit('SAVE_OR_UPDATE', {
       skuId,
       taskType,
@@ -88,8 +91,10 @@ const actions = {
       if (state.task.hasOwnProperty(key)) {
         let detail = false
         while (!detail) {
+          message.warning('正在请求接口...')
           detail = await jd.getItemInfo(key)
         }
+        message.success('请求接口成功！')
         commit('SAVE_OR_UPDATE', {
           skuId: key,
           detail
