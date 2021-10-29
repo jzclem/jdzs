@@ -36,27 +36,24 @@ function cookieCheck(Cookie) {
 /**
  * 获取下单信息
  * @param Cookie
- * @param sku
- * @param num
  * @returns {Promise<any>}
  */
-function getBuyInfo(Cookie, sku, num) {
-  const params = {
-    sku,
-    num,
-    isModifyAddress: false
-  }
+function getBuyInfo(Cookie) {
   return request({
-    method: 'POST',
     uri: URLS.GET_ORDER,
-    form: params,
     headers: {
       Cookie,
       'User-Agent': UserAgent
-    },
-    resolveWithFullResponse: true
+    }
   }).then((resp) => {
-    return handleResponse(resp)
+    const parser = new DOMParser()
+    // 解析返回的HTML代码
+    const dom = parser.parseFromString(resp, 'text/html')
+    const idDom = dom.querySelector('#consignee_id')
+    const id = idDom.getAttribute('value')
+    const imageSrc = dom.querySelector('#hid_upArea_' + id)
+    console.log(imageSrc)
+    // return handleResponse(resp)
   })
 }
 
