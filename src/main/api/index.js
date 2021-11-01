@@ -3,7 +3,7 @@
  */
 import request from 'request-promise'
 import URLS from './url'
-import { handleResponse, getRandomArbitrary } from './utils'
+import { handleResponse } from './utils'
 // import log from 'electron-log'
 
 const UserAgent =
@@ -49,11 +49,8 @@ function getBuyInfo(Cookie) {
     const parser = new DOMParser()
     // 解析返回的HTML代码
     const dom = parser.parseFromString(resp, 'text/html')
-    const idDom = dom.querySelector('#consignee_id')
-    const id = idDom.getAttribute('value')
-    const imageSrc = dom.querySelector('#hid_upArea_' + id)
-    console.log(imageSrc)
-    // return handleResponse(resp)
+    const id = dom.querySelector('#hideAreaIds').getAttribute('value')
+    return id.replace(/-/g, '_')
   })
 }
 

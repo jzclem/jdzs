@@ -118,7 +118,9 @@ export default {
       }
     },
     async createOrder(account, skuId, buyNum, taskType) {
-      await jd.getBuyInfo(account.cookie, skuId, buyNum)
+      await jd.clearCart(account.cookie) // 清空购物车
+      await jd.addGoodsToCart(account.cookie, skuId, buyNum) // 加入购物车
+      await jd.getBuyInfo(account.cookie) // 生成订单
       let password = this.formParams.password.split('').join('u3')
       const submitResult = await jd[this.actions.get(taskType)](account.cookie, password)
       if (submitResult && submitResult.success) {

@@ -14,9 +14,9 @@
         {{ record.isPlusMember ? '是' : '否' }}
       </span>
       <span slot="action" slot-scope="text, record">
-        <a type="link" @click="deleteAccount(record)">
-          删除
-        </a>
+        <a type="link" @click="deleteAccount(record)">删除</a>
+        <a-divider type="vertical" />
+        <a type="link" @click="clearAccountCart(record)">清空购物车</a>
       </span>
     </a-table>
   </div>
@@ -24,6 +24,7 @@
 <script>
 import { mapGetters } from 'vuex'
 const { BrowserWindow } = require('electron').remote
+const jd = window.preload.jd
 export default {
   name: 'account',
   components: {},
@@ -64,6 +65,9 @@ export default {
     this.$store.dispatch('user/checkAccountList')
   },
   methods: {
+    clearAccountCart(row) {
+      jd.clearCart(row.cookie)
+    },
     login() {
       const loginWin = new BrowserWindow({
         width: 800,
