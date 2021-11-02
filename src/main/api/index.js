@@ -219,9 +219,11 @@ async function addGoodsToCart(Cookie, skuId, num) {
  * 提交订单（当前购物车内所有商品）
  * @param Cookie
  * @param password
+ * @param eid
+ * @param fp
  * @returns {Promise<any>}
  */
-async function orderSubmit(Cookie, password) {
+async function orderSubmit(Cookie, password, eid, fp) {
   const params = {
     overseaPurchaseCookies: '',
     vendorRemarks: '[]',
@@ -232,9 +234,8 @@ async function orderSubmit(Cookie, password) {
     'submitOrderParam.btSupport': '0',
     'submitOrderParam.jxj': '1',
     'submitOrderParam.payPassword': `u3${password}`,
-    'submitOrderParam.eid':
-      'KAPAA4UFB4TGCXCJCKQ5KKQCUHMRHJF7CTG2HBWQWSCTM52TDPWS5X47BLQSADQG24AWO4MH76SFJLS56CCBSQE3MM',
-    'submitOrderParam.fp': 'deb1bac170fdbfd7873ecc1e55f4266e',
+    'submitOrderParam.eid': eid,
+    'submitOrderParam.fp': fp,
     'submitOrderParam.isBestCoupon': '1'
   }
   // 请求结算页面

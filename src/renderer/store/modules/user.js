@@ -12,7 +12,9 @@ const state = {
    * @property isPlusMember
    */
   account: {},
-  address: ''
+  address: '',
+  eid: '',
+  fp: ''
 }
 const getters = {
   accountList: (state) => {
@@ -48,6 +50,10 @@ const mutations = {
   },
   SAVE_ADDRESS_ID(state, address) {
     state.address = address
+  },
+  SAVE_EID_FP(state, { eid, fp }) {
+    state.eid = eid
+    state.fp = fp
   }
 }
 

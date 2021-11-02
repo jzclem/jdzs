@@ -13,11 +13,20 @@
       <a-form-item>
         <a-button type="primary" @click="updateAreaId">获取区域ID</a-button>
       </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="howToGet">获取eid与fp</a-button>
+      </a-form-item>
       <a-form-item label="区域ID">
-        <a-input style="width: 200px" v-model="formParams.areaId" placeholder="区域id" />
+        <a-input style="width: 170px" v-model="formParams.areaId" placeholder="区域id" />
+      </a-form-item>
+      <a-form-item label="eid">
+        <a-input style="width: 170px" v-model="formParams.eid" placeholder="账号eid值" />
+      </a-form-item>
+      <a-form-item label="fp">
+        <a-input style="width: 170px" v-model="formParams.fp" placeholder="账号fp值" />
       </a-form-item>
       <a-form-item label="支付密码">
-        <a-input type="password" style="width: 200px" v-model="formParams.password" placeholder="支付密码" />
+        <a-input type="password" style="width: 120px" v-model="formParams.password" placeholder="支付密码" />
       </a-form-item>
     </a-form>
     <a-list item-layout="horizontal" :data-source="taskList">
@@ -66,6 +75,8 @@ export default {
       timers: [],
       formParams: {
         areaId: this.$store.state.user.address,
+        eid: this.$store.state.user.eid,
+        fp: this.$store.state.user.fp,
         password: ''
       },
       actions: new Map([
@@ -79,6 +90,15 @@ export default {
     ...mapGetters('task', ['taskList'])
   },
   methods: {
+    howToGet() {
+      this.$confirm({
+        title: '将以下代码在结算页控制台运行',
+        content:
+          "var eid = $('#eid').val();\n" + "var fp = $('#fp').val();\n" + 'console.log(`eid = ${eid}\\nfp = ${fp}`);',
+        okText: '好的',
+        cancelText: '取消'
+      })
+    },
     updateMes() {
       this.$store.dispatch('task/checkTaskList')
     },
@@ -119,7 +139,7 @@ export default {
               return
             }
             this.$message.info(`账号${account.name}抢购中，还未到抢购时间`)
-          }, 2000)
+          }, 1000)
           this.timers.push({
             pinId: account.pinId,
             skuId,
@@ -139,7 +159,9 @@ export default {
       await jd.addGoodsToCart(account.cookie, skuId, buyNum) // 加入购物车
       await jd.getBuyInfo(account.cookie) // 生成订单
       let password = this.formParams.password.split('').join('u3')
-      const submitResult = await jd[this.actions.get(taskType)](account.cookie, password)
+      let { eid, fp } = this.formParams
+      this.$store.commit('user/SAVE_EID_FP', { eid, fp })
+      const submitResult = await jd[this.actions.get(taskType)](account.cookie, password, eid, fp)
       if (submitResult && submitResult.success) {
         this.stopTaskByAccount(account.pinId, skuId)
         this.$notification.open({
