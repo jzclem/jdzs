@@ -11,7 +11,8 @@ const state = {
    * @property isLogin
    * @property isPlusMember
    */
-  account: {}
+  account: {},
+  address: ''
 }
 const getters = {
   accountList: (state) => {
@@ -45,8 +46,8 @@ const mutations = {
   CLEAR_ALL(state) {
     state.account = {}
   },
-  TEST_TASK(state) {
-    state.task.push(1)
+  SAVE_ADDRESS_ID(state, address) {
+    state.address = address
   }
 }
 

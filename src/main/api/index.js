@@ -4,7 +4,7 @@
 import request from 'request-promise'
 import URLS from './url'
 import { handleResponse } from './utils'
-// import log from 'electron-log'
+import log from 'electron-log'
 
 const UserAgent =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'
@@ -47,9 +47,11 @@ function getBuyInfo(Cookie) {
     }
   }).then((resp) => {
     const parser = new DOMParser()
-    // 解析返回的HTML代码
     const dom = parser.parseFromString(resp, 'text/html')
-    const id = dom.querySelector('#hideAreaIds').getAttribute('value')
+    const area = dom.querySelector('#hideAreaIds')
+    if (!area) return false
+    log.info('获取下单信息')
+    const id = area.getAttribute('value')
     return id.replace(/-/g, '_')
   })
 }
@@ -64,6 +66,7 @@ function getStocks(sku, area) {
   return request(`${URLS.CHECK_STOCKS}?type=getstocks&skuIds=${sku}&area=${area}&_=${+new Date()}`).then((resp) => {
     let result = JSON.parse(resp)
     if (resp && result[sku]) {
+      log.info('库存有货')
       const skuState = result[sku].skuState // 商品是否上架
       const StockState = result[sku].StockState // 商品库存状态：33 -- 现货  0,34 -- 无货  36 -- 采购中  40 -- 可配货
       return skuState === 1 && [33, 40].includes(StockState)
@@ -148,6 +151,7 @@ function selectAllCart(Cookie) {
   }).then((resp) => {
     const result = handleResponse(resp)
     if (result && result.sortedWebCartResult) {
+      log.info('全选购物车中的商品')
       return result.sortedWebCartResult.success
     }
     return false
@@ -160,17 +164,23 @@ function selectAllCart(Cookie) {
  * @returns {Promise<any>}
  */
 function clearCart(Cookie) {
-  return request({
-    uri: URLS.CLEAR_ALL,
-    headers: {
-      Cookie,
-      'User-Agent': UserAgent
-    },
-    resolveWithFullResponse: true
-  }).then((resp) => {
-    const result = handleResponse(resp)
-    if (result && result.sortedWebCartResult) {
-      return result.sortedWebCartResult.success
+  return selectAllCart(Cookie).then((res) => {
+    if (res) {
+      return request({
+        uri: URLS.CLEAR_ALL,
+        headers: {
+          Cookie,
+          'User-Agent': UserAgent
+        },
+        resolveWithFullResponse: true
+      }).then((resp) => {
+        const result = handleResponse(resp)
+        if (result && result.sortedWebCartResult) {
+          log.info('清空购物车')
+          return result.sortedWebCartResult.success
+        }
+        return false
+      })
     }
     return false
   })
@@ -200,6 +210,7 @@ async function addGoodsToCart(Cookie, skuId, num) {
     resolveWithFullResponse: true
   }).then((resp) => {
     const html = handleResponse(resp)
+    log.info('添加商品到购物车')
     return html.indexOf('成功') > -1
   })
 }
@@ -249,6 +260,7 @@ async function orderSubmit(Cookie, password) {
     },
     resolveWithFullResponse: true
   }).then((resp) => {
+    log.info('提交订单')
     return handleResponse(resp)
   })
 }
@@ -269,6 +281,7 @@ function getItemInfo(skuId) {
     const parser = new DOMParser()
     const html = handleResponse(resp)
     if (!html) return false
+    log.info('获取成功')
     // 解析返回的HTML代码
     const dom = parser.parseFromString(html, 'text/html')
     const pageConfig = dom.querySelectorAll('script')[0].innerText

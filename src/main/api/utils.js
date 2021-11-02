@@ -20,12 +20,6 @@ export const handleResponse = (resp) => {
 function parseJson(body) {
   if (typeof body === 'string') {
     const token = body.indexOf("<script>window.location.href='http://item.jd.com/html/token.html")
-    if (token > -1) {
-      log.info(`暂时无法获取`)
-      return false
-    } else {
-      log.info(`获取成功`)
-      return body
-    }
+    return token > -1 ? false : body
   }
 }

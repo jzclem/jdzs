@@ -10,6 +10,9 @@
       <a-form-item>
         <a-button type="primary" @click="updateMes">更新商品信息</a-button>
       </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="updateAreaId">获取区域ID</a-button>
+      </a-form-item>
       <a-form-item label="区域ID">
         <a-input style="width: 200px" v-model="formParams.areaId" placeholder="区域id" />
       </a-form-item>
@@ -62,7 +65,7 @@ export default {
     return {
       timers: [],
       formParams: {
-        areaId: '19_1601_50283_62864',
+        areaId: this.$store.state.user.address,
         password: ''
       },
       actions: new Map([
@@ -78,6 +81,20 @@ export default {
   methods: {
     updateMes() {
       this.$store.dispatch('task/checkTaskList')
+    },
+    updateAreaId() {
+      let that = this
+      this.$confirm({
+        title: '提示',
+        content: '请确保购物车中留有商品',
+        okText: '好的',
+        cancelText: '取消',
+        async onOk() {
+          const data = await jd.getBuyInfo(that.accountList[0].cookie)
+          that.formParams.areaId = data
+          that.$store.commit('user/SAVE_ADDRESS_ID', data)
+        }
+      })
     },
     showAddTask() {
       this.$refs.addTask.show()
@@ -102,7 +119,7 @@ export default {
               return
             }
             this.$message.info(`账号${account.name}抢购中，还未到抢购时间`)
-          }, 1000)
+          }, 2000)
           this.timers.push({
             pinId: account.pinId,
             skuId,
@@ -134,6 +151,13 @@ export default {
         this.stopTaskBySku(skuId)
         this.$notification.open({
           message: `商品库存已空，无法继续抢购`,
+          description: '已清除当前任务相关的定时器',
+          placement: 'bottomRight'
+        })
+      } else if (submitResult && submitResult.message.indexOf('支付密码不正确') > -1) {
+        this.stopTaskBySku(skuId)
+        this.$notification.open({
+          message: `支付密码不正确`,
           description: '已清除当前任务相关的定时器',
           placement: 'bottomRight'
         })

@@ -60,7 +60,7 @@ export default {
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.$store.dispatch('task/addTask', this.formParams)
-          this.$message.success('任务已添加！')
+          this.$message.success('任务正在添加！')
           this.handleCancel()
         }
         this.confirmLoading = false
