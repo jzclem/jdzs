@@ -20,7 +20,7 @@ export default {
   methods: {
     async test() {
       try {
-        const data = await jd.getBuyInfo(this.accountList[0].cookie)
+        const data = await jd.getServerTime()
         log.info(data)
       } catch (error) {
         log.info(error)

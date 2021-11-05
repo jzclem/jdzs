@@ -5,14 +5,14 @@ export const getRandomArbitrary = (min, max) => {
 }
 
 export const handleResponse = (resp) => {
+  // eslint-disable-next-line no-unused-vars
   const { body, statusCode, request } = resp
-  log.info(`接口 ${request.href} 请求结果：${statusCode}`)
+  // log.info(`接口 ${request.href} 请求结果：${statusCode}`)
   let result = parseJson(body)
   try {
     result = JSON.parse(result)
-    log.info('response result:', result)
   } catch (error) {
-    log.info('response body is not JSON.')
+    // log.info('response body is not JSON.')
   }
   return result
 }

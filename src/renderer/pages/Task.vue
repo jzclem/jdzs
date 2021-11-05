@@ -155,29 +155,24 @@ export default {
       }
     },
     async createOrder(account, skuId, buyNum, taskType) {
-      await jd.clearCart(account.cookie) // 清空购物车
+      // await jd.clearCart(account.cookie) // 清空购物车
       await jd.addGoodsToCart(account.cookie, skuId, buyNum) // 加入购物车
-      await jd.getBuyInfo(account.cookie) // 生成订单
-      let password = this.formParams.password.split('').join('u3')
-      let { eid, fp } = this.formParams
+      let { eid, fp, password } = this.formParams
       this.$store.commit('user/SAVE_EID_FP', { eid, fp })
-      const submitResult = await jd[this.actions.get(taskType)](account.cookie, password, eid, fp)
+      const submitResult = await jd[this.actions.get(taskType)](account.cookie, password.split('').join('u3'), eid, fp)
       if (submitResult && submitResult.success) {
-        this.stopTaskByAccount(account.pinId, skuId)
         this.$notification.open({
           message: `恭喜,账号「${account.name}」已抢到`,
           description: '此账号不再参与本轮抢购~',
           placement: 'bottomRight'
         })
       } else if (submitResult && submitResult.resultCode === 600158) {
-        this.stopTaskBySku(skuId)
         this.$notification.open({
           message: `商品库存已空，无法继续抢购`,
           description: '已清除当前任务相关的定时器',
           placement: 'bottomRight'
         })
       } else if (submitResult && submitResult.message.indexOf('支付密码不正确') > -1) {
-        this.stopTaskBySku(skuId)
         this.$notification.open({
           message: `支付密码不正确`,
           description: '已清除当前任务相关的定时器',
@@ -186,6 +181,7 @@ export default {
       } else {
         this.$message.info(submitResult.message)
       }
+      this.stopTaskBySku(skuId)
     },
     stopAll() {
       this.timers.map((timer) => {

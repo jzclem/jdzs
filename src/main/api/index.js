@@ -247,6 +247,9 @@ async function orderSubmit(Cookie, password, eid, fp) {
       'Content-Type': ContentType
     },
     resolveWithFullResponse: true
+    // eslint-disable-next-line no-unused-vars
+  }).then((resp) => {
+    log.info('请求结算页面')
   })
   // 提交订单
   return request({
@@ -262,6 +265,7 @@ async function orderSubmit(Cookie, password, eid, fp) {
     resolveWithFullResponse: true
   }).then((resp) => {
     log.info('提交订单')
+    log.info(handleResponse(resp))
     return handleResponse(resp)
   })
 }
