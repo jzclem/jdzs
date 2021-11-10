@@ -59,11 +59,6 @@ import dayjs from 'dayjs'
 import AddTask from './modal/AddTask'
 // import log from 'electron-log'
 const jd = window.preload.jd
-// 抢购提示语
-const NOTIFIACTION = {
-  1: '该商品是预约抢购商品，需要自行加入到购物车，并确保购物车里不含其他可提交商品',
-  2: '该商品是秒杀商品，会自动提交订单'
-}
 
 export default {
   name: 'Task',
@@ -78,11 +73,7 @@ export default {
         eid: this.$store.state.user.eid,
         fp: this.$store.state.user.fp,
         password: ''
-      },
-      actions: new Map([
-        [1, 'orderSubmit'],
-        [2, 'killOrderSubmit']
-      ])
+      }
     }
   },
   computed: {
@@ -119,7 +110,7 @@ export default {
     showAddTask() {
       this.$refs.addTask.show()
     },
-    async createOrders({ skuId, buyNum, taskType, isSetTime, startTime }) {
+    async createOrders({ skuId, buyNum, isSetTime, startTime }) {
       if (!this.formParams.password) {
         this.$notification.open({ message: '请输入支付密码', description: '', placement: 'bottomRight' })
         return
@@ -128,14 +119,14 @@ export default {
       if (StockState) {
         this.$notification.open({
           message: '检测到该地区有货，开始抢购',
-          description: NOTIFIACTION[taskType],
+          description: '该商品是预约抢购商品，需要自行加入到购物车，并确保购物车里不含其他可提交商品',
           placement: 'bottomRight'
         })
         // 所有账号都加入抢购
         this.accountList.map((account) => {
           let task = setInterval(() => {
             if (!isSetTime || (isSetTime && +Date.now() >= +new Date(startTime))) {
-              this.createOrder(account, skuId, buyNum, taskType)
+              this.createOrder(account, skuId, buyNum)
               return
             }
             this.$message.info(`账号${account.name}抢购中，还未到抢购时间`)
@@ -154,12 +145,12 @@ export default {
         })
       }
     },
-    async createOrder(account, skuId, buyNum, taskType) {
-      // await jd.clearCart(account.cookie) // 清空购物车
+    async createOrder(account, skuId, buyNum) {
+      this.stopTaskBySku(skuId)
       await jd.addGoodsToCart(account.cookie, skuId, buyNum) // 加入购物车
       let { eid, fp, password } = this.formParams
       this.$store.commit('user/SAVE_EID_FP', { eid, fp })
-      const submitResult = await jd[this.actions.get(taskType)](account.cookie, password.split('').join('u3'), eid, fp)
+      const submitResult = await jd.orderSubmit(account.cookie, password.split('').join('u3'), eid, fp)
       if (submitResult && submitResult.success) {
         this.$notification.open({
           message: `恭喜,账号「${account.name}」已抢到`,
@@ -181,7 +172,6 @@ export default {
       } else {
         this.$message.info(submitResult.message)
       }
-      this.stopTaskBySku(skuId)
     },
     stopAll() {
       this.timers.map((timer) => {

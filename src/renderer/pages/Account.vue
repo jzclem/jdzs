@@ -6,7 +6,7 @@
     <a-button type="primary" class="mg-l10" @click="clear">
       清空账号
     </a-button>
-    <a-table :columns="columns" :data-source="accountList" class="mg-t10" rowKey="uid">
+    <a-table :columns="columns" :data-source="accountList" class="mg-t10" rowKey="pinId">
       <span slot="isLogin" slot-scope="text, record">
         {{ record.isLogin ? '已登录' : '未登录' }}
       </span>
@@ -75,9 +75,7 @@ export default {
       })
       loginWin.loadURL('https://passport.jd.com/new/login.aspx?ReturnUrl=https%3A%2F%2Fwww.jd.com%2F')
       loginWin.webContents.on('did-navigate', (event, url) => {
-        if (url !== 'https://www.jd.com/') {
-          return
-        }
+        if (url !== 'https://www.jd.com/') return
         loginWin.webContents.session.cookies
           .get({ domain: '.jd.com' })
           .then((cookies) => {

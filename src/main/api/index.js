@@ -26,6 +26,7 @@ function cookieCheck(Cookie) {
     resolveWithFullResponse: true
   }).then((resp) => {
     const body = resp.body
+    log.info(`账号${body ? '有效' : '过期'}`)
     return {
       isLogin: !!(body === true || body === false),
       isPlusMember: body === true
@@ -66,72 +67,13 @@ function getStocks(sku, area) {
   return request(`${URLS.CHECK_STOCKS}?type=getstocks&skuIds=${sku}&area=${area}&_=${+new Date()}`).then((resp) => {
     let result = JSON.parse(resp)
     if (resp && result[sku]) {
-      log.info('库存有货')
       const skuState = result[sku].skuState // 商品是否上架
       const StockState = result[sku].StockState // 商品库存状态：33 -- 现货  0,34 -- 无货  36 -- 采购中  40 -- 可配货
-      return skuState === 1 && [33, 40].includes(StockState)
+      const status = skuState === 1 && [33, 40].includes(StockState)
+      log.info(`库存${status ? '有货' : '无货'}`)
+      return status
     }
     return false
-  })
-}
-
-/**
- * TODO: 没有试验成功过，需要修改
- * 提交秒杀订单
- * @param Cookie
- * @param skuId
- * @param num
- * @param buyInfo
- * @returns {Promise<any>}
- */
-function killOrderSubmit(Cookie, skuId, num, buyInfo) {
-  const params = {
-    skuId,
-    num,
-    addressId: buyInfo['addressList'][0]['id'], // 4139253293
-    yuShou: true,
-    isModifyAddress: false,
-    name: buyInfo['addressList'][0]['name'],
-    provinceId: buyInfo['addressList'][0]['provinceId'],
-    cityId: buyInfo['addressList'][0]['cityId'],
-    countyId: buyInfo['addressList'][0]['countyId'],
-    townId: buyInfo['addressList'][0]['townId'],
-    addressDetail: buyInfo['addressList'][0]['addressDetail'],
-    mobile: buyInfo['addressList'][0]['mobile'],
-    mobileKey: buyInfo['addressList'][0]['mobileKey'],
-    email: buyInfo['addressList'][0]['email'],
-    postCode: buyInfo['addressList'][0]['postCode'],
-    invoiceTitle: buyInfo['invoiceInfo']['invoiceTitle'],
-    invoiceCompanyName: '',
-    invoiceContent: buyInfo['invoiceInfo']['invoiceContentType'],
-    invoiceTaxpayerNO: '',
-    invoiceEmail: buyInfo['invoiceInfo']['invoiceEmail'],
-    invoicePhone: buyInfo['invoiceInfo']['invoicePhone'],
-    invoicePhoneKey: buyInfo['invoiceInfo']['invoicePhoneKey'],
-    invoice: true,
-    password: '',
-    codTimeType: 3,
-    paymentType: 4,
-    areaCode: '',
-    overseas: 0,
-    phone: '',
-    eid: '',
-    fp: '',
-    token: buyInfo['token'],
-    pru: ''
-  }
-  return request({
-    method: 'POST',
-    uri: URLS.KILL_ORDER_SUBMIT,
-    form: params,
-    headers: {
-      Cookie,
-      'User-Agent': UserAgent,
-      'Content-Type': ContentType
-    },
-    resolveWithFullResponse: true
-  }).then((resp) => {
-    return handleResponse(resp)
   })
 }
 
@@ -321,7 +263,6 @@ function getServerTime() {
 export default {
   cookieCheck,
   getBuyInfo,
-  killOrderSubmit,
   selectAllCart,
   clearCart,
   addGoodsToCart,

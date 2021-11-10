@@ -4,7 +4,6 @@
       <a-form-model-item label="抢购类型">
         <a-select v-model="formParams.taskType">
           <a-select-option :value="1">预约抢购</a-select-option>
-          <a-select-option :value="2">秒杀商品</a-select-option>
         </a-select>
       </a-form-model-item>
       <a-form-item label="定时">
