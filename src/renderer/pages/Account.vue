@@ -6,6 +6,10 @@
     <a-button type="primary" class="mg-l10" @click="clear">
       清空账号
     </a-button>
+    <a-select class="mg-l10" v-model="accountType">
+      <a-select-option :value="0">京东</a-select-option>
+      <!--      <a-select-option :value="1">苏宁</a-select-option>-->
+    </a-select>
     <a-table :columns="columns" :data-source="accountList" class="mg-t10" rowKey="pinId">
       <span slot="isLogin" slot-scope="text, record">
         {{ record.isLogin ? '已登录' : '未登录' }}
@@ -55,7 +59,8 @@ export default {
           key: 'action',
           scopedSlots: { customRender: 'action' }
         }
-      ]
+      ],
+      accountType: 0
     }
   },
   computed: {
@@ -70,14 +75,18 @@ export default {
     },
     login() {
       const loginWin = new BrowserWindow({
-        width: 800,
-        height: 600
+        width: 1024,
+        height: 768
       })
-      loginWin.loadURL('https://passport.jd.com/new/login.aspx?ReturnUrl=https%3A%2F%2Fwww.jd.com%2F')
+      let loadURL = this.accountType
+        ? 'https://passport.suning.com/ids/login'
+        : 'https://passport.jd.com/new/login.aspx?ReturnUrl=https%3A%2F%2Fwww.jd.com%2F'
+      let domain = this.accountType ? 'suning' : 'jd'
+      loginWin.loadURL(loadURL)
       loginWin.webContents.on('did-navigate', (event, url) => {
-        if (url !== 'https://www.jd.com/') return
+        if (url !== `https://www.${domain}.com/`) return
         loginWin.webContents.session.cookies
-          .get({ domain: '.jd.com' })
+          .get({ domain: `.${domain}.com` })
           .then((cookies) => {
             const cookieStr = cookies.reduce((str, cookie) => {
               const { name, value } = cookie
@@ -85,7 +94,7 @@ export default {
               return str
             }, '')
             loginWin.destroy()
-            this.$store.dispatch('user/saveAccount', cookieStr)
+            this.$store.dispatch('user/saveAccount', { cookie: cookieStr, accountType: this.accountType })
             this.$message.success('账号已添加！')
           })
           .catch(() => {

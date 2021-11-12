@@ -62,19 +62,20 @@ const actions = {
    * 保存账号
    * @param commit
    * @param cookie
+   * @param accountType
    * @returns {Promise<void>}
    */
-  async saveAccount({ commit }, cookie) {
-    const pinId = cookie.match(/pinId=(.*?);/)[1]
-    const name = window.decodeURIComponent(cookie.match(/unick=(.*?);/)[1])
+  async saveAccount({ commit }, { cookie, accountType }) {
+    const pinId = accountType ? cookie.match(/authId=(.*?);/)[1] : cookie.match(/pinId=(.*?);/)[1]
+    const name = accountType ? cookie.match(/nick=(.*?);/)[1] : cookie.match(/unick=(.*?);/)[1]
     let res = { isLogin: false, isPlusMember: false }
     try {
       res = await jd.cookieCheck(cookie)
     } finally {
       commit('SAVE_OR_UPDATE', {
         pinId,
-        name,
         cookie,
+        name: window.decodeURIComponent(name),
         isLogin: res.isLogin,
         isPlusMember: res.isPlusMember
       })

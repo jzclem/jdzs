@@ -69,7 +69,7 @@ function getStocks(sku, area) {
     if (resp && result[sku]) {
       const skuState = result[sku].skuState // 商品是否上架
       const StockState = result[sku].StockState // 商品库存状态：33 -- 现货  0,34 -- 无货  36 -- 采购中  40 -- 可配货
-      const status = skuState === 1 && [33, 40].includes(StockState)
+      const status = skuState === 1 && [33, 36, 40].includes(StockState)
       log.info(`库存${status ? '有货' : '无货'}`)
       return status
     }

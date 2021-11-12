@@ -39,7 +39,7 @@ export default {
       formParams: {
         taskType: 1,
         isSetTime: true,
-        startTime: null,
+        startTime: '2021-11-11 10:00:00',
         skuId: '',
         buyNum: 1
       },

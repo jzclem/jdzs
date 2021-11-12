@@ -16,6 +16,16 @@
       <a-form-item>
         <a-button type="primary" @click="howToGet">获取eid与fp</a-button>
       </a-form-item>
+      <a-form-item label="抢购频率">
+        <a-select v-model="formParams.interval">
+          <a-select-option :value="50">50ms</a-select-option>
+          <a-select-option :value="100">100ms</a-select-option>
+          <a-select-option :value="200">200ms</a-select-option>
+          <a-select-option :value="500">500ms</a-select-option>
+          <a-select-option :value="750">750ms</a-select-option>
+          <a-select-option :value="1000">1000ms</a-select-option>
+        </a-select>
+      </a-form-item>
       <a-form-item label="区域ID">
         <a-input style="width: 170px" v-model="formParams.areaId" placeholder="区域id" />
       </a-form-item>
@@ -69,6 +79,7 @@ export default {
     return {
       timers: [],
       formParams: {
+        interval: 100,
         areaId: this.$store.state.user.address,
         eid: this.$store.state.user.eid,
         fp: this.$store.state.user.fp,
@@ -130,7 +141,7 @@ export default {
               return
             }
             this.$message.info(`账号${account.name}抢购中，还未到抢购时间`)
-          }, 1000)
+          }, this.formParams.interval)
           this.timers.push({
             pinId: account.pinId,
             skuId,
