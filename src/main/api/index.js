@@ -26,7 +26,7 @@ function cookieCheck(Cookie) {
     resolveWithFullResponse: true
   }).then((resp) => {
     const body = resp.body
-    log.info(`账号${body ? '有效' : '过期'}`)
+    log.info(`账号${body === true || body === false ? '有效' : '过期'}`)
     return {
       isLogin: !!(body === true || body === false),
       isPlusMember: body === true
