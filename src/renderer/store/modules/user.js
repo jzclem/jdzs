@@ -13,6 +13,7 @@ const state = {
    */
   account: {},
   address: '',
+  password: '',
   eid: '',
   fp: ''
 }
@@ -50,6 +51,9 @@ const mutations = {
   },
   SAVE_ADDRESS_ID(state, address) {
     state.address = address
+  },
+  SAVE_REMEMBER(state, password) {
+    state.password = password
   },
   SAVE_EID_FP(state, { eid, fp }) {
     state.eid = eid

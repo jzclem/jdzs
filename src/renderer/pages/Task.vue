@@ -38,6 +38,9 @@
       <a-form-item label="支付密码">
         <a-input type="password" style="width: 120px" v-model="formParams.password" placeholder="支付密码" />
       </a-form-item>
+      <a-form-item>
+        <a-checkbox v-model="formParams.isCheck" @click="rememberPwd">记住密码</a-checkbox>
+      </a-form-item>
     </a-form>
     <a-list item-layout="horizontal" :data-source="taskList">
       <a-list-item slot="renderItem" slot-scope="item">
@@ -81,9 +84,10 @@ export default {
       formParams: {
         interval: 100,
         areaId: this.$store.state.user.address,
+        isCheck: !!this.$store.state.user.password,
         eid: this.$store.state.user.eid,
         fp: this.$store.state.user.fp,
-        password: ''
+        password: this.$store.state.user.password
       }
     }
   },
@@ -92,6 +96,9 @@ export default {
     ...mapGetters('task', ['taskList'])
   },
   methods: {
+    rememberPwd(e) {
+      this.$store.commit('user/SAVE_REMEMBER', e.target.checked ? this.formParams.password : '')
+    },
     howToGet() {
       this.$confirm({
         title: '将以下代码在结算页控制台运行',
@@ -216,9 +223,7 @@ export default {
       this.$store.commit('task/CLEAR_ALL')
     },
     formatDate(value) {
-      if (!value) {
-        return '-'
-      }
+      if (!value) return '-'
       return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
     },
     isTaskRunning(skuId) {
