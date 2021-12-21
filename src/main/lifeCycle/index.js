@@ -1,4 +1,4 @@
-import { app, protocol, BrowserWindow, Menu } from 'electron'
+import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
@@ -32,10 +32,12 @@ const menus = [
   }
 ]
 const menu = Menu.buildFromTemplate(menus)
+let win
+let tray = null
 
 async function createWindow() {
   // Create the browser window.
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 880,
     height: 660,
     webPreferences: {
@@ -54,8 +56,52 @@ async function createWindow() {
   } else {
     createProtocol('app')
     // Load the index.html when not in development
-    win.loadURL('app://./index.html')
+    await win.loadURL('app://./index.html')
   }
+  // 窗口关闭的监听
+  win.on('closed', () => {
+    win = null
+  })
+  // 触发关闭时触发
+  win.on('close', (event) => {
+    // 截获 close 默认行为
+    event.preventDefault()
+    // 点击关闭时触发close事件，我们按照之前的思路在关闭时，隐藏窗口，隐藏任务栏窗口
+    win.hide()
+    win.setSkipTaskbar(true)
+  })
+  // 触发显示时触发
+  win.on('show', () => {})
+  // 触发隐藏时触发
+  win.on('hide', () => {})
+
+  // 新建托盘
+  tray = new Tray(path.join(__dirname, 'favicon.ico'))
+  // 托盘名称
+  tray.setToolTip('京东助手')
+  // 托盘菜单
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '显示',
+      click: () => {
+        win.show()
+      }
+    },
+    {
+      label: '退出',
+      click: () => {
+        win.destroy()
+      }
+    }
+  ])
+  // 载入托盘菜单
+  tray.setContextMenu(contextMenu)
+  // 双击触发
+  tray.on('double-click', () => {
+    // 双击通知区图标实现应用的显示或隐藏
+    win.isVisible() ? win.hide() : win.show()
+    win.isVisible() ? win.setSkipTaskbar(false) : win.setSkipTaskbar(true)
+  })
   Menu.setApplicationMenu(menu)
 }
 
@@ -78,15 +124,15 @@ class LifeCycle {
           console.error('Vue Devtools failed to install:', e.toString())
         }
       }
-      createWindow()
+      await createWindow()
     })
   }
 
   onRunning() {
-    app.on('activate', () => {
+    app.on('activate', async () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+      if (win === null) await createWindow()
     })
   }
 

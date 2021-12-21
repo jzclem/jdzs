@@ -43,11 +43,17 @@ module.exports = {
         dmg: {},
         mac: {},
         win: {
+          icon: 'src/renderer/assets/icon.ico',
           target: ['nsis', 'zip']
         },
         nsis: {
-          oneClick: false,
-          allowToChangeInstallationDirectory: true
+          oneClick: false, //是否一键安装
+          allowToChangeInstallationDirectory: true, //允许修改安装目录
+          installerIcon: 'src/renderer/assets/icon.ico', //安装图标
+          uninstallerIcon: 'src/renderer/assets/icon.ico', //卸载图标
+          installerHeaderIcon: 'src/renderer/assets/icon.ico', //安装时头部图标
+          createDesktopShortcut: true, //创建桌面图标
+          createStartMenuShortcut: false //创建开始菜单图标
         }
       }
     }
