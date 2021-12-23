@@ -18,8 +18,13 @@
           style="width: 100%;"
         />
       </a-form-model-item>
+      <a-form-model-item label="抢购提前">
+        <a-select v-model="formParams.advanceTime">
+          <a-select-option v-for="(item, index) in selectArr" :key="index" :value="item">{{ item }}ms</a-select-option>
+        </a-select>
+      </a-form-model-item>
       <a-form-model-item label="商品ID" prop="skuId">
-        <a-input v-model="formParams.skuId" />
+        <a-input v-model="formParams.skuId" @keyup.enter="handleOk" />
       </a-form-model-item>
       <a-form-model-item label="购买数量">
         <a-input-number :min="1" v-model="formParams.buyNum" />
@@ -37,9 +42,11 @@ export default {
       visible: false,
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
+      selectArr: [50, 100, 200, 300, 500, 750, 1000],
       formParams: {
         taskType: 1,
         isSetTime: true,
+        advanceTime: 50,
         startTime: '2021-11-11 10:00:00',
         skuId: '',
         buyNum: 1
@@ -48,13 +55,13 @@ export default {
         taskType: [{ required: true, message: '必填' }],
         skuId: [{ required: true, message: '必填' }]
       },
-      timeArr: ['08', '10', '14', '16', '18', '20', '22'],
+      timeArr: ['08', '10', '12', '14', '16', '18', '20', '22'],
       confirmLoading: false
     }
   },
   created() {
     for (let i = 0; i < this.timeArr.length; i++) {
-      let str = `${dayjs(new Date()).format('YYYY-MM-DD')} ${this.timeArr[i]}:00:00`
+      let str = `${dayjs().format('YYYY-MM-DD')} ${this.timeArr[i]}:00:00`
       if (dayjs().valueOf() - dayjs(str).valueOf() < 0) {
         this.formParams.startTime = str
         break

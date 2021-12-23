@@ -11,6 +11,7 @@ const state = {
    * @property isSetTime
    * @property startTime
    * @property buyNum
+   * @property advanceTime
    * @property buyInfo
    */
   task: {}
@@ -28,13 +29,14 @@ const getters = {
   }
 }
 const mutations = {
-  SAVE_OR_UPDATE(state, { skuId, taskType, isSetTime, startTime, buyNum, detail }) {
+  SAVE_OR_UPDATE(state, { skuId, taskType, isSetTime, startTime, buyNum, detail, advanceTime }) {
     const origin = state.task[skuId]
-    let params = { skuId, taskType, isSetTime, startTime, buyNum, detail }
+    let params = { skuId, taskType, isSetTime, startTime, buyNum, detail, advanceTime }
     params.skuId = skuId || origin.skuId
     params.taskType = taskType || origin.taskType
     params.buyNum = buyNum || origin.buyNum
     params.detail = detail || origin.detail
+    params.advanceTime = advanceTime || origin.advanceTime
     if (isSetTime === undefined) {
       params.isSetTime = origin.isSetTime
     }
@@ -60,10 +62,11 @@ const actions = {
    * @param isSetTime
    * @param startTime
    * @param buyNum
+   * @param advanceTime
    * @param form
    * @returns {Promise<void>}
    */
-  async addTask({ commit }, { skuId, taskType, isSetTime, startTime, buyNum }) {
+  async addTask({ commit }, { skuId, taskType, isSetTime, startTime, buyNum, advanceTime }) {
     let detail = false
     while (!detail) {
       message.warning('正在请求接口...')
@@ -76,6 +79,7 @@ const actions = {
       isSetTime,
       startTime,
       buyNum,
+      advanceTime,
       detail
     })
   },

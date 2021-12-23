@@ -18,12 +18,7 @@
       </a-form-item>
       <a-form-item label="抢购频率">
         <a-select v-model="formParams.interval">
-          <a-select-option :value="50">50ms</a-select-option>
-          <a-select-option :value="100">100ms</a-select-option>
-          <a-select-option :value="200">200ms</a-select-option>
-          <a-select-option :value="500">500ms</a-select-option>
-          <a-select-option :value="750">750ms</a-select-option>
-          <a-select-option :value="1000">1000ms</a-select-option>
+          <a-select-option v-for="(item, index) in selectArr" :key="index" :value="item">{{ item }}ms</a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item label="区域ID">
@@ -44,7 +39,11 @@
     </a-form>
     <a-list item-layout="horizontal" :data-source="taskList">
       <a-list-item slot="renderItem" slot-scope="item">
-        <a-list-item-meta :description="`定时：${formatDate(item.startTime)} , 购买数量：${item.buyNum}`">
+        <a-list-item-meta
+          :description="
+            `定时：${formatDate(item.startTime)} , 购买数量：${item.buyNum} , 提前时间：${item.advanceTime}ms`
+          "
+        >
           <a slot="title">{{ item.detail.name }}</a>
           <a-avatar slot="avatar" :src="`http:${item.detail.imageSrc}`" />
         </a-list-item-meta>
@@ -81,6 +80,7 @@ export default {
   data() {
     return {
       timers: [],
+      selectArr: [50, 100, 200, 300, 500, 750, 1000],
       formParams: {
         interval: 100,
         areaId: this.$store.state.user.address,
@@ -128,7 +128,7 @@ export default {
     showAddTask() {
       this.$refs.addTask.show()
     },
-    async createOrders({ skuId, buyNum, isSetTime, startTime }) {
+    async createOrders({ skuId, buyNum, isSetTime, startTime, advanceTime }) {
       if (!this.formParams.password) {
         this.$notification.open({ message: '请输入支付密码', description: '', placement: 'bottomRight' })
         return
@@ -143,7 +143,7 @@ export default {
         // 所有账号都加入抢购
         this.accountList.map((account) => {
           let task = setInterval(() => {
-            if (!isSetTime || (isSetTime && +Date.now() >= +new Date(startTime))) {
+            if (!isSetTime || (isSetTime && +Date.now() >= +new Date(startTime) - advanceTime)) {
               this.createOrder(account, skuId, buyNum)
               return
             }
