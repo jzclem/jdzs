@@ -41,7 +41,10 @@
       <a-list-item slot="renderItem" slot-scope="item">
         <a-list-item-meta
           :description="
-            `定时：${formatDate(item.startTime)} , 购买数量：${item.buyNum} , 提前时间：${item.advanceTime}ms`
+            `定时：${formatDate(item.startTime)} ,
+             购买数量：${item.buyNum} ,
+             提前时间：${item.advanceTime}ms ,
+             抢购账号：${item.account === 'all' ? '所有账号' : item.account}`
           "
         >
           <a slot="title">{{ item.detail.name }}</a>
@@ -128,7 +131,7 @@ export default {
     showAddTask() {
       this.$refs.addTask.show()
     },
-    async createOrders({ skuId, buyNum, isSetTime, startTime, advanceTime }) {
+    async createOrders({ skuId, buyNum, isSetTime, startTime, advanceTime, account }) {
       if (!this.formParams.password) {
         this.$notification.open({ message: '请输入支付密码', description: '', placement: 'bottomRight' })
         return
@@ -141,16 +144,17 @@ export default {
           placement: 'bottomRight'
         })
         // 所有账号都加入抢购
-        this.accountList.map((account) => {
+        this.accountList.map((item) => {
+          if (account !== 'all' && account !== item.name) return
           let task = setInterval(() => {
             if (!isSetTime || (isSetTime && +Date.now() >= +new Date(startTime) - advanceTime)) {
-              this.createOrder(account, skuId, buyNum)
+              this.createOrder(item, skuId, buyNum)
               return
             }
-            this.$message.info(`账号${account.name}抢购中，还未到抢购时间`)
+            this.$message.info(`账号${item.name}抢购中，还未到抢购时间`)
           }, this.formParams.interval)
           this.timers.push({
-            pinId: account.pinId,
+            pinId: item.pinId,
             skuId,
             task
           })
@@ -163,15 +167,15 @@ export default {
         })
       }
     },
-    async createOrder(account, skuId, buyNum) {
+    async createOrder(item, skuId, buyNum) {
       this.stopTaskBySku(skuId)
-      await jd.addGoodsToCart(account.cookie, skuId, buyNum) // 加入购物车
+      await jd.addGoodsToCart(item.cookie, skuId, buyNum) // 加入购物车
       let { eid, fp, password } = this.formParams
       this.$store.commit('user/SAVE_EID_FP', { eid, fp })
-      const submitResult = await jd.orderSubmit(account.cookie, password.split('').join('u3'), eid, fp)
+      const submitResult = await jd.orderSubmit(item.cookie, password.split('').join('u3'), eid, fp)
       if (submitResult && submitResult.success) {
         this.$notification.open({
-          message: `恭喜,账号「${account.name}」已抢到`,
+          message: `恭喜,账号「${item.name}」已抢到`,
           description: '此账号不再参与本轮抢购~',
           placement: 'bottomRight'
         })

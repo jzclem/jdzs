@@ -1,9 +1,12 @@
 <template>
   <a-modal title="添加任务" :visible="visible" :confirm-loading="confirmLoading" @ok="handleOk" @cancel="handleCancel">
     <a-form-model ref="form" :model="formParams" :label-col="labelCol" :wrapper-col="wrapperCol" :rules="formRules">
-      <a-form-model-item label="抢购类型">
-        <a-select v-model="formParams.taskType">
-          <a-select-option :value="1">预约抢购</a-select-option>
+      <a-form-model-item label="选择账号">
+        <a-select v-model="formParams.account">
+          <a-select-option value="all">所有账号</a-select-option>
+          <a-select-option v-for="item in accountList" :key="item.pinId" :value="item.name">
+            {{ item.name }}
+          </a-select-option>
         </a-select>
       </a-form-model-item>
       <a-form-model-item label="定时">
@@ -44,15 +47,16 @@ export default {
       wrapperCol: { span: 18 },
       selectArr: [50, 100, 200, 300, 500, 750, 1000],
       formParams: {
+        account: 'all',
         taskType: 1,
         isSetTime: true,
-        advanceTime: 50,
+        advanceTime: 100,
         startTime: '2021-11-11 10:00:00',
         skuId: '',
         buyNum: 1
       },
       formRules: {
-        taskType: [{ required: true, message: '必填' }],
+        // taskType: [{ required: true, message: '必填' }],
         skuId: [{ required: true, message: '必填' }]
       },
       timeArr: ['08', '10', '12', '14', '16', '18', '20', '22'],

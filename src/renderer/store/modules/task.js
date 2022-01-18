@@ -6,6 +6,7 @@ import message from 'ant-design-vue/es/message'
 const state = {
   /**
    * 任务列表
+   * @property account
    * @property skuId
    * @property taskType
    * @property isSetTime
@@ -29,17 +30,16 @@ const getters = {
   }
 }
 const mutations = {
-  SAVE_OR_UPDATE(state, { skuId, taskType, isSetTime, startTime, buyNum, detail, advanceTime }) {
+  SAVE_OR_UPDATE(state, { skuId, taskType, isSetTime, startTime, buyNum, detail, advanceTime, account }) {
     const origin = state.task[skuId]
-    let params = { skuId, taskType, isSetTime, startTime, buyNum, detail, advanceTime }
+    let params = {}
     params.skuId = skuId || origin.skuId
     params.taskType = taskType || origin.taskType
     params.buyNum = buyNum || origin.buyNum
     params.detail = detail || origin.detail
     params.advanceTime = advanceTime || origin.advanceTime
-    if (isSetTime === undefined) {
-      params.isSetTime = origin.isSetTime
-    }
+    params.account = account || origin.account
+    params.isSetTime = isSetTime || origin.isSetTime
     if (params.isSetTime) {
       params.startTime = startTime || origin.startTime
     }
@@ -63,10 +63,11 @@ const actions = {
    * @param startTime
    * @param buyNum
    * @param advanceTime
+   * @param account
    * @param form
    * @returns {Promise<void>}
    */
-  async addTask({ commit }, { skuId, taskType, isSetTime, startTime, buyNum, advanceTime }) {
+  async addTask({ commit }, { skuId, taskType, isSetTime, startTime, buyNum, advanceTime, account }) {
     let detail = false
     while (!detail) {
       message.warning('正在请求接口...')
@@ -80,6 +81,7 @@ const actions = {
       startTime,
       buyNum,
       advanceTime,
+      account,
       detail
     })
   },
