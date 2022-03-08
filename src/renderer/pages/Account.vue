@@ -12,7 +12,8 @@
     </a-select>
     <a-table :columns="columns" :data-source="accountList" class="mg-t10" rowKey="pinId">
       <span slot="isLogin" slot-scope="text, record">
-        {{ record.isLogin ? '已登录' : '未登录' }}
+        <a-tag v-if="record.isLogin" color="green">已登录</a-tag>
+        <a-tag v-else color="red">未登录</a-tag>
       </span>
       <span slot="isPlusMember" slot-scope="text, record">
         {{ record.isPlusMember ? '是' : '否' }}

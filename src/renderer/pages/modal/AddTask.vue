@@ -63,19 +63,27 @@ export default {
       confirmLoading: false
     }
   },
-  created() {
-    for (let i = 0; i < this.timeArr.length; i++) {
-      let str = `${dayjs().format('YYYY-MM-DD')} ${this.timeArr[i]}:00:00`
-      if (dayjs().valueOf() - dayjs(str).valueOf() < 0) {
-        this.formParams.startTime = str
-        break
-      }
+  watch: {
+    visible() {
+      this.handleTime()
     }
+  },
+  created() {
+    this.handleTime()
   },
   computed: {
     ...mapGetters('user', ['accountList'])
   },
   methods: {
+    handleTime() {
+      for (let i = 0; i < this.timeArr.length; i++) {
+        let time = `${dayjs().format('YYYY-MM-DD')} ${this.timeArr[i]}:00:00`
+        if (dayjs().valueOf() - dayjs(time).valueOf() < 0) {
+          this.formParams.startTime = time
+          break
+        }
+      }
+    },
     handleOk() {
       this.confirmLoading = true
       this.$refs.form.validate((valid) => {
