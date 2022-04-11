@@ -9,5 +9,6 @@ export default {
   GET_ORDER: 'https://trade.jd.com/shopping/order/getOrderInfo.action',
   SUBMIT_ORDER: 'https://trade.jd.com/shopping/order/submitOrder.action',
   GET_ITEM_STOCK: 'https://c0.3.cn/stock',
+  GET_MIAOSHA_LIST: 'https://api.m.jd.com/api',
   GET_SERVER_TIME: 'https://api.m.jd.com/client.action?functionId=queryMaterialProducts&client=wh5'
 }

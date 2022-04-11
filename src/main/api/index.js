@@ -260,6 +260,34 @@ function getServerTime() {
   })
 }
 
+/**
+ * 查询秒杀列表
+ * @returns {Promise<any>}
+ */
+function pcMiaoShaAreaList(Cookie, gid) {
+  return request({
+    uri: URLS.GET_MIAOSHA_LIST,
+    qs: {
+      functionId: 'pcMiaoShaAreaList',
+      client: 'pc',
+      appid: 'o2_channels',
+      clientVersion: '1.0.0',
+      callback: 'pcMiaoShaAreaList',
+      jsonp: 'pcMiaoShaAreaList',
+      body: gid || {},
+      _: new Date().getTime()
+    },
+    headers: {
+      Cookie,
+      'User-Agent': UserAgent,
+      Referer: 'https://miaosha.jd.com/'
+    },
+    resolveWithFullResponse: true
+  }).then((resp) => {
+    return handleResponse(resp)
+  })
+}
+
 export default {
   cookieCheck,
   getBuyInfo,
@@ -269,5 +297,6 @@ export default {
   orderSubmit,
   getItemInfo,
   getStocks,
+  pcMiaoShaAreaList,
   getServerTime
 }

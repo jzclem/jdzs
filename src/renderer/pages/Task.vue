@@ -17,7 +17,7 @@
         <a-button type="primary" @click="howToGet">获取eid与fp</a-button>
       </a-form-item>
       <a-form-item label="抢购频率">
-        <a-select v-model="formParams.interval">
+        <a-select style="width: 90px" v-model="formParams.interval">
           <a-select-option v-for="(item, index) in selectArr" :key="index" :value="item">{{ item }}ms</a-select-option>
         </a-select>
       </a-form-item>
@@ -83,9 +83,9 @@ export default {
   data() {
     return {
       timers: [],
-      selectArr: [50, 100, 200, 300, 500, 750, 1000],
+      selectArr: [50, 75, 100, 125, 150, 200, 300, 500, 750, 1000],
       formParams: {
-        interval: 100,
+        interval: 75,
         areaId: this.$store.state.user.address,
         isCheck: !!this.$store.state.user.password,
         eid: this.$store.state.user.eid,
